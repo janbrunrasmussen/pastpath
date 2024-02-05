@@ -9,7 +9,9 @@
 - Focus on finding the URL for that repo, docs site or blog that you can only remember small part of
 
 **pastpath** works by collecting browser history from browsers and exposing it through an API and simple frontend.
-It can be used as a bookmarked page or as the default page on new tabs (through extensions, see below (LINK))
+It can be used as a bookmarked page or as the default page on new tabs (through browser extensions)
+
+<img width="1004" alt="image" src="https://github.com/janbrunrasmussen/pastpath/assets/24657397/dc29b2b2-351a-4a14-9784-6f1e38609041">
 
 ## Features
 
