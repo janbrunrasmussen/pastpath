@@ -1,0 +1,100 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    height: 100vh;
+    background: #f7f7f7;
+    /* Optional: added a background color for better contrast */
+}
+
+#search-container {
+    position: relative;
+    width: 80%;
+    max-width: 600px;
+    margin-top: 5vh;
+    /* This will place the search bar 5% from the top of the viewport */
+}
+
+#search-box {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    margin-bottom: 1rem;
+    /* Adds a little space below the search box */
+}
+
+#results-container {
+    position: absolute;
+    width: 100%;
+    background: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-height: 1000px;
+    overflow-y: auto;
+    z-index: 1000;
+    /* To ensure the dropdown appears on top of other content */
+}
+
+.result-item {
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+    /* Padding inside the result item */
+    cursor: pointer;
+    border-bottom: 1px solid #ddd;
+    gap: 2px;
+    /* Space between flex items */
+    text-decoration: none;
+    /* Remove underlining */
+    color: inherit;
+}
+
+.result-item:last-child {
+    border-bottom: none;
+}
+
+.result-item:hover {
+    background-color: #f9f9f9;
+}
+
+.result-title {
+    font-size: 1em;
+    font-weight: bold;
+    margin: 0;
+}
+
+.result-url {
+    font-size: 1em;
+    color: #333;
+    margin: 0;
+}
+
+.result-metadata {
+    font-size: 0.8em;
+    color: #7269c2;
+    margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.result-item.selected {
+    background-color: #e0e0e0;
+    /* Change as desired for highlight */
+}
+
+.hidden {
+    display: none;
+}
+
+#last-updated-timestamp {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    padding: 5px;
+    border-radius: 5px;
+    font-size: 0.9em;
+    color: grey;
+    z-index: 100;
+    /* Ensure it's above other elements */
+}

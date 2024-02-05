@@ -1,0 +1,6 @@
+pastpath
+pastpath.db*
+
+config*.json
+
+.tmp
