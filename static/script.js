@@ -1,5 +1,5 @@
-document.addEventListener('DOMContentLoaded', function () {
-    new SearchNavigation()
+document.addEventListener('DOMContentLoaded', () => {
+    new SearchNavigation();
     setupSearchFocus();
     setupSearchInput();
     fetchLastUpdatedInfo();
@@ -18,14 +18,12 @@ class SearchNavigation {
     }
 
     handleKeyboardNavigation(e) {
-        let items = this.resultsContainer.getElementsByClassName('result-item');
+        const items = this.resultsContainer.getElementsByClassName('result-item');
         const maxIndex = items.length - 1;
         if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-            if (e.key === 'ArrowDown') {
-                this.selectedIndex = this.selectedIndex < maxIndex ? this.selectedIndex + 1 : 0;
-            } else {
-                this.selectedIndex = this.selectedIndex > 0 ? this.selectedIndex - 1 : maxIndex;
-            }
+            this.selectedIndex = (e.key === 'ArrowDown') 
+                ? (this.selectedIndex < maxIndex ? this.selectedIndex + 1 : 0)
+                : (this.selectedIndex > 0 ? this.selectedIndex - 1 : maxIndex);
             this.updateSelectedItem(items);
             e.preventDefault();
         } else if (e.key === 'Enter') {
@@ -48,9 +46,7 @@ class SearchNavigation {
 }
 
 function setupSearchFocus() {
-    window.onload = function () {
-        document.getElementById('search-box').focus();
-    };
+    window.onload = () => document.getElementById('search-box').focus();
 }
 
 function setupSearchInput() {
@@ -64,9 +60,9 @@ function setupSearchInput() {
 
 function handleSearchInput(searchTerm, resultsContainer) {
     if (searchTerm.length > 0) {
-        fetchData(`/search?term=${encodeURIComponent(searchTerm)}`, (data) => {
+        fetchData(`/search?term=${encodeURIComponent(searchTerm)}`, data => {
             displayResults(data, resultsContainer);
-        }, (error) => {
+        }, error => {
             console.error('Error fetching search results:', error);
         });
     } else {
@@ -83,7 +79,7 @@ function fetchData(url, onSuccess, onError) {
 }
 
 function displayResults(results, resultsContainer) {
-    resultsContainer.innerHTML = ''; // Clear existing results
+    resultsContainer.innerHTML = '';
     results.forEach(result => {
         const resultItem = createResultItem(result);
         resultsContainer.appendChild(resultItem);
@@ -107,30 +103,18 @@ function createResultItem(result) {
     return resultItem;
 }
 
-function updateSelectedItem(items, selectedIndex) {
-    Array.from(items).forEach(item => item.classList.remove('selected'));
-    if (selectedIndex >= 0) {
-        items[selectedIndex].classList.add('selected');
-        items[selectedIndex].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-    }
-}
-
 function googleSearch() {
     const searchBoxContent = document.getElementById('search-box').value;
     const query = encodeURIComponent(searchBoxContent);
-    window.location.href = 'https://www.google.com/search?q=' + query;
+    window.location.href = `https://www.google.com/search?q=${query}`;
 }
 
 function fetchLastUpdatedInfo() {
-    fetchData('/last-updated', (data) => {
+    fetchData('/last-updated', data => {
         const lastRunTimestampElement = document.getElementById('last-updated-timestamp');
-        if (data.last_timestamp) {
-            const formattedDate = new Date(data.last_timestamp * 1000).toLocaleString();
-            lastRunTimestampElement.textContent = `Updated: ${formattedDate}, Version: ${data.build_version}`;
-        } else {
-            lastRunTimestampElement.textContent = 'No update timestamp is available.';
-        }
-    }, (error) => {
+        const formattedDate = data.last_timestamp ? new Date(data.last_timestamp * 1000).toLocaleString() : 'No update timestamp is available.';
+        lastRunTimestampElement.textContent = `Updated: ${formattedDate}, Version: ${data.build_version}`;
+    }, error => {
         console.error('Error fetching last updated info:', error);
     });
 }
