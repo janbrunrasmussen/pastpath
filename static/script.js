@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const searchManager = new SearchManager();
-    searchManager.init(); // Call init to set up everything related to search navigation
+    searchManager.init();
     fetchLastUpdatedInfo();
 });
 
@@ -26,7 +26,7 @@ class SearchManager {
         if (e.key === 'ArrowDown') {
             if (this.selectedIndex < maxIndex) this.selectedIndex++;
             else this.selectedIndex = -1;
-            
+
             this.updateSelection(items);
         } else if (e.key === 'ArrowUp') {
             if (this.selectedIndex > 0) this.selectedIndex--;
@@ -35,19 +35,19 @@ class SearchManager {
                 this.searchBox.focus();
                 return;
             }
-            
+
             this.updateSelection(items);
         } else if (e.key === 'Enter') {
             if (this.selectedIndex === -1) {
                 const query = this.searchBox.value;
-                webSearch(query); // Make sure this line is correctly triggering the search
+                webSearch(query);
                 e.preventDefault();
             } else if (this.selectedIndex >= 0 && this.selectedIndex <= maxIndex) {
                 items[this.selectedIndex].click();
                 e.preventDefault();
             }
         }
-        
+
         if (this.selectedIndex === -1) {
             this.searchBox.focus();
         } else if (this.selectedIndex >= 0) {
@@ -72,7 +72,7 @@ class SearchManager {
     }
 
     handleSearchInput(searchTerm) {
-        this.selectedIndex = -1; // Reset selection on new input
+        this.selectedIndex = -1;
         if (searchTerm.length > 0) {
             fetchData(`/search?term=${encodeURIComponent(searchTerm)}`, (data) => {
                 this.displayResults(data);
@@ -86,16 +86,14 @@ class SearchManager {
     }
 
     displayResults(results) {
-        this.resultsContainer.innerHTML = ''; // Clear existing results
+        this.resultsContainer.innerHTML = '';
 
-        // If results are empty or fewer than before, reset selectedIndex
         if (!results || results.length === 0) {
             this.resultsContainer.classList.add('hidden');
-            this.selectedIndex = -1; // Reset selectedIndex to start from the search box next time
-            return; // Exit early as there's nothing more to display
+            this.selectedIndex = -1;
+            return;
         }
 
-        // Continue with displaying results if not empty
         const fragment = document.createDocumentFragment();
         results.forEach(result => {
             const resultItem = this.createResultItem(result);
@@ -105,8 +103,7 @@ class SearchManager {
         this.resultsContainer.appendChild(fragment);
         this.resultsContainer.classList.remove('hidden');
 
-        // Since results are updated, consider resetting selectedIndex or adjusting it based on new results
-        this.selectedIndex = -1; // Reset or adjust this based on your navigation logic
+        this.selectedIndex = -1;
     }
 
     createResultItem(result) {
