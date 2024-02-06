@@ -1,9 +1,51 @@
 document.addEventListener('DOMContentLoaded', function () {
+    new SearchNavigation()
     setupSearchFocus();
     setupSearchInput();
-    setupKeyboardNavigation();
     fetchLastUpdatedInfo();
 });
+
+class SearchNavigation {
+    constructor() {
+        this.selectedIndex = -1; // Encapsulated within the class
+        this.resultsContainer = document.getElementById('results-container');
+        this.setupKeyboardNavigation();
+    }
+
+    setupKeyboardNavigation() {
+        const searchBox = document.getElementById('search-box');
+        searchBox.addEventListener('keydown', (e) => this.handleKeyboardNavigation(e));
+    }
+
+    handleKeyboardNavigation(e) {
+        let items = this.resultsContainer.getElementsByClassName('result-item');
+        const maxIndex = items.length - 1;
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+            if (e.key === 'ArrowDown') {
+                this.selectedIndex = this.selectedIndex < maxIndex ? this.selectedIndex + 1 : 0;
+            } else {
+                this.selectedIndex = this.selectedIndex > 0 ? this.selectedIndex - 1 : maxIndex;
+            }
+            this.updateSelectedItem(items);
+            e.preventDefault();
+        } else if (e.key === 'Enter') {
+            if (this.selectedIndex >= 0 && this.selectedIndex <= maxIndex) {
+                items[this.selectedIndex].click();
+            } else {
+                googleSearch();
+            }
+            e.preventDefault();
+        }
+    }
+
+    updateSelectedItem(items) {
+        Array.from(items).forEach(item => item.classList.remove('selected'));
+        if (this.selectedIndex >= 0) {
+            items[this.selectedIndex].classList.add('selected');
+            items[this.selectedIndex].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
+    }
+}
 
 function setupSearchFocus() {
     window.onload = function () {
@@ -30,40 +72,6 @@ function handleSearchInput(searchTerm, resultsContainer) {
     } else {
         resultsContainer.innerHTML = '';
         resultsContainer.classList.add('hidden');
-    }
-}
-
-function setupKeyboardNavigation() {
-    const searchBox = document.getElementById('search-box');
-    const resultsContainer = document.getElementById('results-container');
-    let selectedIndex = -1; // No item selected initially
-
-    searchBox.addEventListener('keydown', function (e) {
-        handleKeyboardNavigation(e, resultsContainer, selectedIndex, (newIndex) => {
-            selectedIndex = newIndex; // Update the selectedIndex with the new value
-        });
-    });
-}
-
-function handleKeyboardNavigation(e, resultsContainer, selectedIndex, updateSelectedIndex) {
-    let items = resultsContainer.getElementsByClassName('result-item');
-    const maxIndex = items.length - 1;
-    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-        if (e.key === 'ArrowDown') {
-            selectedIndex = selectedIndex < maxIndex ? selectedIndex + 1 : 0;
-        } else {
-            selectedIndex = selectedIndex > 0 ? selectedIndex - 1 : maxIndex;
-        }
-        updateSelectedIndex(selectedIndex);
-        updateSelectedItem(items, selectedIndex);
-        e.preventDefault();
-    } else if (e.key === 'Enter') {
-        if (selectedIndex >= 0 && selectedIndex <= maxIndex) {
-            items[selectedIndex].click();
-        } else {
-            googleSearch();
-        }
-        e.preventDefault();
     }
 }
 
