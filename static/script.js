@@ -30,7 +30,8 @@ class SearchNavigation {
             if (this.selectedIndex >= 0 && this.selectedIndex <= maxIndex) {
                 items[this.selectedIndex].click();
             } else {
-                googleSearch();
+                const query = document.getElementById('search-box').value;
+                webSearch(query);
             }
             e.preventDefault();
         }
@@ -49,13 +50,28 @@ function setupSearchFocus() {
     window.onload = () => document.getElementById('search-box').focus();
 }
 
+function debounce(func, wait) {
+    let timeout;
+
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func.apply(this, args);
+        };
+
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
 function setupSearchInput() {
     const searchBox = document.getElementById('search-box');
     const resultsContainer = document.getElementById('results-container');
+    const debouncedSearch = debounce(function(event) {
+        handleSearchInput(event.target.value, resultsContainer);
+    }, 50);
 
-    searchBox.addEventListener('input', function () {
-        handleSearchInput(this.value, resultsContainer);
-    });
+    searchBox.addEventListener('input', debouncedSearch);
 }
 
 function handleSearchInput(searchTerm, resultsContainer) {
@@ -79,11 +95,15 @@ function fetchData(url, onSuccess, onError) {
 }
 
 function displayResults(results, resultsContainer) {
-    resultsContainer.innerHTML = '';
+    const fragment = document.createDocumentFragment();
+
     results.forEach(result => {
         const resultItem = createResultItem(result);
-        resultsContainer.appendChild(resultItem);
+        fragment.appendChild(resultItem);
     });
+
+    resultsContainer.innerHTML = '';
+    resultsContainer.appendChild(fragment);
     resultsContainer.classList.toggle('hidden', results.length === 0);
 }
 
@@ -103,12 +123,6 @@ function createResultItem(result) {
     return resultItem;
 }
 
-function googleSearch() {
-    const searchBoxContent = document.getElementById('search-box').value;
-    const query = encodeURIComponent(searchBoxContent);
-    window.location.href = `https://www.google.com/search?q=${query}`;
-}
-
 function fetchLastUpdatedInfo() {
     fetchData('/last-updated', data => {
         const lastRunTimestampElement = document.getElementById('last-updated-timestamp');
@@ -117,4 +131,11 @@ function fetchLastUpdatedInfo() {
     }, error => {
         console.error('Error fetching last updated info:', error);
     });
+}
+
+const DEFAULT_SEARCH_PROVIDER_URL = 'https://www.google.com/search?q=';
+
+function webSearch(query, providerUrl = DEFAULT_SEARCH_PROVIDER_URL) {
+    const encodedQuery = encodeURIComponent(query);
+    window.location.href = `${providerUrl}${encodedQuery}`;
 }
