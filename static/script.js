@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    new SearchNavigation();
+    window.searchNavigation = new SearchNavigation();
     setupSearchFocus();
     setupSearchInput();
     fetchLastUpdatedInfo();
@@ -21,7 +21,7 @@ class SearchNavigation {
         const items = this.resultsContainer.getElementsByClassName('result-item');
         const maxIndex = items.length - 1;
         if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
-            this.selectedIndex = (e.key === 'ArrowDown') 
+            this.selectedIndex = (e.key === 'ArrowDown')
                 ? (this.selectedIndex < maxIndex ? this.selectedIndex + 1 : 0)
                 : (this.selectedIndex > 0 ? this.selectedIndex - 1 : maxIndex);
             this.updateSelectedItem(items);
@@ -43,6 +43,10 @@ class SearchNavigation {
             items[this.selectedIndex].classList.add('selected');
             items[this.selectedIndex].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
         }
+    }
+
+    resetSelectedIndex() {
+        this.selectedIndex = -1;
     }
 }
 
@@ -68,6 +72,7 @@ function setupSearchInput() {
     const searchBox = document.getElementById('search-box');
     const resultsContainer = document.getElementById('results-container');
     const debouncedSearch = debounce(function(event) {
+        searchNavigation.resetSelectedIndex();
         handleSearchInput(event.target.value, resultsContainer);
     }, 50);
 
