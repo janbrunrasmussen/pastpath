@@ -22,7 +22,7 @@ class SearchManager {
     handleKeyboardNavigation(e) {
         const items = this.resultsContainer.getElementsByClassName('result-item');
         const maxIndex = items.length - 1;
-        
+
         if (e.key === 'ArrowDown') {
             if (this.selectedIndex < maxIndex) this.selectedIndex++;
             else this.selectedIndex = -1;
@@ -86,14 +86,27 @@ class SearchManager {
     }
 
     displayResults(results) {
+        this.resultsContainer.innerHTML = ''; // Clear existing results
+
+        // If results are empty or fewer than before, reset selectedIndex
+        if (!results || results.length === 0) {
+            this.resultsContainer.classList.add('hidden');
+            this.selectedIndex = -1; // Reset selectedIndex to start from the search box next time
+            return; // Exit early as there's nothing more to display
+        }
+
+        // Continue with displaying results if not empty
         const fragment = document.createDocumentFragment();
         results.forEach(result => {
             const resultItem = this.createResultItem(result);
             fragment.appendChild(resultItem);
         });
-        this.resultsContainer.innerHTML = '';
+
         this.resultsContainer.appendChild(fragment);
-        this.resultsContainer.classList.toggle('hidden', results.length === 0);
+        this.resultsContainer.classList.remove('hidden');
+
+        // Since results are updated, consider resetting selectedIndex or adjusting it based on new results
+        this.selectedIndex = -1; // Reset or adjust this based on your navigation logic
     }
 
     createResultItem(result) {
