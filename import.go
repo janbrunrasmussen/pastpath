@@ -31,11 +31,11 @@ func updateBrowsersMetadata(b Browsers) Browsers {
 		case "chrome":
 			b[i].Query = "SELECT url, title, visit_count, last_visit_time FROM urls ORDER BY last_visit_time DESC"
 			b[i].TimestampConverter = convertChromeTimestamp
-	
+
 		case "firefox":
 			b[i].Query = "SELECT url, COALESCE(title,'') AS title, visit_count, COALESCE(last_visit_date,0) AS last_visit_date FROM moz_places ORDER BY last_visit_date DESC"
 			b[i].TimestampConverter = convertFirefoxTimestamp
-	
+
 		default:
 			log.Printf("Browser not supported: %s", b[i].Name)
 		}
