@@ -18,12 +18,17 @@ import (
 )
 
 type Config struct {
-	ServerPort                       int16   `json:"ServerPort"`
+	ServerPort                       int16    `json:"ServerPort"`
 	TmpDir                           string   `json:"TmpDir"`
 	InstanceID                       string   `json:"InstanceID"`
 	HistoryProcessingIntervalSeconds int      `json:"HistoryProcessingIntervalSeconds"`
 	LocalDBPath                      string   `json:"LocalDBPath"`
+	Search                           Search   `json:"Search"`
 	Browsers                         Browsers `json:"Browsers"`
+}
+
+type Search struct {
+	ReplaceHTTPWithHTTPS bool `json:"ReplaceHTTPWithHTTPS"`
 }
 
 func NewDefaultConfig() *Config {
@@ -32,6 +37,7 @@ func NewDefaultConfig() *Config {
 		TmpDir:                           ".tmp",
 		HistoryProcessingIntervalSeconds: 600,
 		LocalDBPath:                      "pastpath.db",
+		Search:                           Search{ReplaceHTTPWithHTTPS: true},
 	}
 }
 
@@ -85,7 +91,7 @@ func main() {
 	// Define routes
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/search", func(w http.ResponseWriter, r *http.Request) {
-		searchHandler(db, w, r)
+		searchHandler(db, cfg.Search.ReplaceHTTPWithHTTPS, w, r)
 	})
 	http.HandleFunc("/last-updated", func(w http.ResponseWriter, r *http.Request) {
 		lastUpdatedHandler(db, w, r)
@@ -94,7 +100,7 @@ func main() {
 
 	// Start HTTP server
 	log.Printf("Starting server on port %d", cfg.ServerPort)
-	srv := &http.Server{Addr: fmt.Sprintf(":%d",cfg.ServerPort)}
+	srv := &http.Server{Addr: fmt.Sprintf(":%d", cfg.ServerPort)}
 	go func() {
 		if err := srv.ListenAndServe(); err != http.ErrServerClosed {
 			log.Fatalf("HTTP server ListenAndServe: %v", err)
@@ -121,7 +127,7 @@ func loadConfig(configFile string) (*Config, error) {
 
 	file, err := os.Open(configFile)
 	if err != nil {
-		return nil, errors.Wrapf(err,"Unable to open config file: %s", configFile)
+		return nil, errors.Wrapf(err, "Unable to open config file: %s", configFile)
 	}
 	defer file.Close()
 
