@@ -23,8 +23,8 @@ type Config struct {
 	InstanceID                       string   `json:"InstanceID"`
 	HistoryProcessingIntervalSeconds int      `json:"HistoryProcessingIntervalSeconds"`
 	LocalDBPath                      string   `json:"LocalDBPath"`
-	Browsers                         Browsers `json:"Browsers"`
 	Search                           Search   `json:"Search"`
+	Browsers                         Browsers `json:"Browsers"`
 }
 
 type Search struct {

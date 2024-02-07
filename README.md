@@ -54,6 +54,9 @@ Add a json configuration file like this one:
     "InstanceID": "YOUR DEVICE",
     "HistoryProcessingInterval": 600,
     "LocalDBPath": "pastpath.db",
+    "Search": {
+        "ReplaceHTTPWithHTTPS": true
+    },
     "Browsers": [
         {
             "Name": "chrome",
