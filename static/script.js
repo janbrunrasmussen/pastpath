@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
+    setupSearchFocus();
     const searchManager = new SearchManager();
     searchManager.init();
     fetchLastUpdatedInfo();
