@@ -78,9 +78,9 @@ body {
     align-items: center;
 }
 
-.result-item.selected {
+.result-item:focus, .result-item:hover {
+    outline: none;
     background-color: #e0e0e0;
-    /* Change as desired for highlight */
 }
 
 .hidden {
