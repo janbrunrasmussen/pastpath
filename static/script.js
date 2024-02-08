@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 class SearchManager {
     constructor() {
-        this.selectedIndex = -1;
         this.resultsContainer = document.getElementById('results-container');
         this.searchBox = document.getElementById('search-box');
     }
@@ -18,49 +17,41 @@ class SearchManager {
     }
 
     setupKeyboardNavigation() {
-        this.searchBox.addEventListener('keydown', (e) => this.handleKeyboardNavigation(e));
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                this.handleArrowNavigation(e);
+            } else if (e.key === 'Enter') {
+                this.handleEnterPress(e);
+            }
+        });
     }
-    handleKeyboardNavigation(e) {
-        const items = this.resultsContainer.getElementsByClassName('result-item');
-        const maxIndex = items.length - 1;
+
+    handleArrowNavigation(e) {
+        const focusable = Array.from(this.resultsContainer.querySelectorAll('.result-item'));
+        const focusedElement = document.activeElement;
+        const currentIndex = focusable.indexOf(focusedElement);
 
         if (e.key === 'ArrowDown') {
-            if (this.selectedIndex < maxIndex) this.selectedIndex++;
-            else this.selectedIndex = -1;
-
-            this.updateSelection(items);
+            if (currentIndex < focusable.length - 1) {
+                e.preventDefault();
+                focusable[currentIndex + 1].focus();
+            }
         } else if (e.key === 'ArrowUp') {
-            if (this.selectedIndex > 0) this.selectedIndex--;
-            else if (this.selectedIndex <= 0) {
-                this.selectedIndex = -1;
+            if (currentIndex > 0) {
+                e.preventDefault();
+                focusable[currentIndex - 1].focus();
+            } else {
+                e.preventDefault();
                 this.searchBox.focus();
-                return;
             }
-
-            this.updateSelection(items);
-        } else if (e.key === 'Enter') {
-            if (this.selectedIndex === -1) {
-                const query = this.searchBox.value;
-                webSearch(query);
-                e.preventDefault();
-            } else if (this.selectedIndex >= 0 && this.selectedIndex <= maxIndex) {
-                items[this.selectedIndex].click();
-                e.preventDefault();
-            }
-        }
-
-        if (this.selectedIndex === -1) {
-            this.searchBox.focus();
-        } else if (this.selectedIndex >= 0) {
-            items[this.selectedIndex].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
         }
     }
 
-    updateSelection(items) {
-        Array.from(items).forEach(item => item.classList.remove('selected'));
-        if (this.selectedIndex >= 0) {
-            items[this.selectedIndex].classList.add('selected');
-            items[this.selectedIndex].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    handleEnterPress(e) {
+        const activeElement = document.activeElement;
+        if (activeElement === this.searchBox && this.searchBox.value.trim()) {
+            e.preventDefault();
+            webSearch(this.searchBox.value.trim());
         }
     }
 
@@ -73,7 +64,6 @@ class SearchManager {
     }
 
     handleSearchInput(searchTerm) {
-        this.selectedIndex = -1;
         if (searchTerm.length > 0) {
             fetchData(`/search?term=${encodeURIComponent(searchTerm)}`, (data) => {
                 this.displayResults(data);
@@ -91,7 +81,6 @@ class SearchManager {
 
         if (!results || results.length === 0) {
             this.resultsContainer.classList.add('hidden');
-            this.selectedIndex = -1;
             return;
         }
 
@@ -103,8 +92,6 @@ class SearchManager {
 
         this.resultsContainer.appendChild(fragment);
         this.resultsContainer.classList.remove('hidden');
-
-        this.selectedIndex = -1;
     }
 
     createResultItem(result) {
