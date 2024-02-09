@@ -93,6 +93,12 @@ func main() {
 	http.HandleFunc("/search", func(w http.ResponseWriter, r *http.Request) {
 		searchHandler(db, cfg.Search.ReplaceHTTPWithHTTPS, w, r)
 	})
+	http.HandleFunc("/opensearch", func(w http.ResponseWriter, r *http.Request) {
+		searchSuggestionsHandler(db, cfg.Search.ReplaceHTTPWithHTTPS, w, r)
+	})
+	http.HandleFunc("/redirect", func(w http.ResponseWriter, r *http.Request) {
+		redirectHandler(w, r)
+	})
 	http.HandleFunc("/last-updated", func(w http.ResponseWriter, r *http.Request) {
 		lastUpdatedHandler(db, w, r)
 	})
