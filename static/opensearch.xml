@@ -3,11 +3,11 @@
     <ShortName>pastpath</ShortName>
     <Description>The greatest search engine for browser history</Description>
     <Tags>web</Tags>
-    <Contact>email@example.com</Contact>
+    <Contact>youremail@example.com</Contact>
     <Url type="text/html" template="http://www.localhost:10000/redirect?term={searchTerms}"></Url>
     <Url type="application/x-suggestions+json"
          template="http://www.localhost:10000/opensearch?term={searchTerms}"></Url>
-    <Image width="16" height="16" type="image/x-icon">http://www.example.com/favicon.ico</Image>
+    <Image width="16" height="16" type="image/x-icon">static/favicon.ico</Image>
     <InputEncoding>UTF-8</InputEncoding>
     <OutputEncoding>UTF-8</OutputEncoding>
 </OpenSearchDescription>
