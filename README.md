@@ -16,9 +16,9 @@ It can be used as a bookmarked page or as the default page on new tabs (through 
 ## Features
 
 - **Multi-Browser Support**: Collects history from Chrome and Firefox (but can be extended to work with Safari, and Edge).
-- **Simple Search Interface**: A simple interface for easy navigation and retrieval of your browsing history, to find _that_ page...
+- **Simple Search Interface**: A simple interface for easy navigation and retrieval of your browsing history, to find _that_ page you are looking for...
 - **Privacy First**: Designed to work locally on your machine, ensuring that your data stays private.
-- **Cross-Platform Compatibility**: While developer for macOS, it is cross compilable for any OS and architecuture that [Go supports](https://go.dev/src/go/build/syslist.go)
+- **Cross-Platform Compatibility**: It is cross compilable for any OS and architecuture that [Go supports](https://go.dev/src/go/build/syslist.go)
 
 ## Getting Started
 
@@ -28,7 +28,7 @@ For **pastpath** to work you need 3 steps (which are described in detail below):
 
 - Get a binary (for now you build it) and put it in an appropriate location
 - Define a config file with your browser information
-- Make the binary run using your favorite service manager
+- Make the binary run using your favorite service manager (systemd, launchd etc.)
 
 Then go to the web page and search your history at `http://localhost:10000` (or whatever port you configured).
 
