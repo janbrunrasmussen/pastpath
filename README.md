@@ -88,6 +88,17 @@ Path to history databases for your OS and browser is easy to find on the web, th
 
 The search used is a basic SQL `like` based approach, with each space-separated term appended as it's own like. This has proven to provide fast and reliable results, even if it does not provide a fuzzy search option. Experiments with fzf did not show great potential.
 
+## OpenSearch (experimental)
+
+Firefox (and maybe other browers, not Chrome) supports searching in omnibox (address bar) through custom OpenSearch compatible search engine. **pastpath** has experimental support for using this feature in Firefox, such that you can search history in your omnibox. These steps roughly outlines how to enable this:
+
+1) Check `opensearch.xml` is configured with correct port
+2) Go localhost:10000, add **pastpath**v as search engine in top right corner search bar (it is a bit tricky to find the button)
+3) Set **pastpath** to default search engine in settings
+4) Now you can get suggestions. It shows up as "title (url)". On `enter` it redirects to url. If url is not there, it redirect to google search.
+
+Experience is not as good and rich as **pastpath** UI.
+
 ## Roadmap
 
 Items on top of the TODO list:

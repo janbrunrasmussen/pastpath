@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+    <ShortName>pastpath</ShortName>
+    <Description>The greatest search engine for browser history</Description>
+    <Tags>web</Tags>
+    <Contact>youremail@example.com</Contact>
+    <Url type="text/html" template="http://www.localhost:10000/redirect?term={searchTerms}"></Url>
+    <Url type="application/x-suggestions+json"
+         template="http://www.localhost:10000/opensearch?term={searchTerms}"></Url>
+    <Image width="16" height="16" type="image/x-icon">static/favicon.ico</Image>
+    <InputEncoding>UTF-8</InputEncoding>
+    <OutputEncoding>UTF-8</OutputEncoding>
+</OpenSearchDescription>
