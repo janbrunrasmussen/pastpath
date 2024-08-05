@@ -9,6 +9,7 @@ import (
 	"os"
 	"strings"
 	"time"
+	"fmt"
 
 	"path/filepath"
 
@@ -77,6 +78,11 @@ func (browsers Browsers) processHistory(db *sql.DB, tmpDir, instanceID string) e
 		}
 	}
 
+	err = updateUrlsCache(db)
+	if err != nil {
+		return err
+	}
+
 	err = cleanTempDir(tmpDir)
 	if err != nil {
 		return err
@@ -136,8 +142,8 @@ func hashURL(url string) string {
 }
 
 func createTables(db *sql.DB) error {
-	createURLsTable := `
-        CREATE TABLE IF NOT EXISTS urls (
+	statements := []string{
+		`CREATE TABLE IF NOT EXISTS urls (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             url TEXT,
             title TEXT,
@@ -150,20 +156,37 @@ func createTables(db *sql.DB) error {
         );
 		CREATE INDEX IF NOT EXISTS idx_urls_url_last_visit_time ON urls(url, last_visit_time);
 		CREATE INDEX IF NOT EXISTS idx_urls_url ON urls(url);
-		REINDEX;`
-	_, err := db.Exec(createURLsTable)
-	if err != nil {
-		return err
-	}
-
-	createLastRunTable := `
-        CREATE TABLE IF NOT EXISTS last_run (
+		REINDEX urls;`,
+		`CREATE TABLE IF NOT EXISTS urls_cache (
+			id INTEGER,
+            url TEXT,
+			url_lower TEXT,
+			url_https TEXT,
+			url_https_lower TEXT,
+            title TEXT,
+			title_lower TEXT,
+            visit_count INTEGER,
+            last_visit_time INTEGER,
+            browser TEXT,
+            instance_id TEXT,
+            url_hash TEXT TEXT
+        );
+		CREATE INDEX IF NOT EXISTS idx_urls_title ON urls_cache (title_lower);
+		CREATE INDEX IF NOT EXISTS idx_urls_url ON urls_cache (url_lower);
+		CREATE INDEX IF NOT EXISTS idx_urls_https_url ON urls_cache (url_https_lower);`,
+		`CREATE TABLE IF NOT EXISTS last_run (
             instance TEXT,
             browser TEXT,
             timestamp INTEGER
-        );`
-	_, err = db.Exec(createLastRunTable)
-	return err
+        );`,
+	}
+	for _, s := range statements {
+		_, err := db.Exec(s)
+		if err != nil {
+			return fmt.Errorf("error executing statement %q: %w", s, err)
+		}
+	}
+	return nil
 }
 
 func fetchEntries(db *sql.DB, query string, convertTimestamp func(int64) int64) ([]BrowserHistoryEntry, error) {
@@ -224,6 +247,35 @@ func upsertEntriesToDB(db *sql.DB, entries []BrowserHistoryEntry, browser, insta
 	log.Printf("Done merging for browser: %s", browser)
 	return nil
 }
+
+func updateUrlsCache(db *sql.DB) error{
+	updateQuery := `
+		DELETE FROM urls_cache;
+		INSERT INTO urls_cache (id, url, url_lower, url_https, url_https_lower, title, title_lower, visit_count, last_visit_time, browser, instance_id, url_hash)
+		/* Some times the title changes for the url, so here the latest title is selected for each url. */
+		WITH latest_titles AS (
+			SELECT url, title, ROW_NUMBER() OVER (PARTITION BY url ORDER BY last_visit_time DESC) AS rownumber
+				FROM urls
+		)
+		SELECT id, u.url, LOWER(u.url) as url_lower, u.url,LOWER(u.url),lt.title, LOWER(lt.title) as title_lower,
+		visit_count, last_visit_time, browser, instance_id, url_hash
+		FROM urls u
+		JOIN latest_titles lt ON u.url = lt.url AND lt.rownumber = 1
+		WHERE u.url LIKE 'https://%'
+		UNION
+		SELECT id, u.url, LOWER(u.url) as url_lower, coalesce(u2.url,u.url) as url_https, LOWER(coalesce(u2.url,u.url)) AS url_https_lower,
+		lt.title, LOWER(lt.title) as title_lower,
+		visit_count, last_visit_time, browser, instance_id, url_hash
+		FROM urls u
+		JOIN latest_titles lt ON u.url = lt.url AND lt.rownumber = 1
+		LEFT JOIN (SELECT DISTINCT url FROM urls) u2 ON REPLACE(u.url, 'http://', 'https://')=u2.url
+		WHERE u.url LIKE 'http://%';
+		REINDEX urls_cache;
+	`
+	_, err := db.Exec(updateQuery)
+	return err
+}
+
 
 func insertLastRun(db *sql.DB, browser, instanceID string) error {
 	insertQuery := "INSERT INTO last_run (instance, browser, timestamp) VALUES (?, ?, ?)"

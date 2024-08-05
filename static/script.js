@@ -58,7 +58,7 @@ class SearchManager {
     setupSearchInput() {
         const debouncedSearch = debounce((event) => {
             this.handleSearchInput(event.target.value);
-        }, 50);
+        }, 250);
 
         this.searchBox.addEventListener('input', debouncedSearch);
     }
