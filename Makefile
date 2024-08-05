@@ -24,7 +24,7 @@ install: build
 	launchctl unload $(LAUNCH_DIR)/$(LAUNCH_FILE) || :
 	launchctl load $(LAUNCH_DIR)/$(LAUNCH_FILE)
 	launchctl start $(LAUNCH_FILE) || :
-	sleep 2 && curl -s -o /dev/null -w "%{http_code}" localhost:10000 | grep -q "^20" || (echo "Server not started" && false)
+	sleep 10 && curl -s -o /dev/null -w "%{http_code}" localhost:10000 | grep -q "^20" || (echo "Server not started" && false)
 .PHONY: install
 
 update: build
@@ -32,7 +32,7 @@ update: build
 	cp $(CONFIG_FILE) $(APP_PATH)
 	cp -a static $(APP_PATH)
 	kill $$(pgrep -f "$(APP_PATH)/$(APP)")
-	sleep 2 && curl -s -o /dev/null -w "%{http_code}" localhost:10000 | grep -q "^20" || (echo "Server not started" && false)
+	sleep 10 && curl -s -o /dev/null -w "%{http_code}" localhost:10000 | grep -q "^20" || (echo "Server not started" && false)
 .PHONY: install
 
 run:

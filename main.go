@@ -14,7 +14,6 @@ import (
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/pkg/errors"
 )
 
 type Config struct {
@@ -133,7 +132,7 @@ func loadConfig(configFile string) (*Config, error) {
 
 	file, err := os.Open(configFile)
 	if err != nil {
-		return nil, errors.Wrapf(err, "Unable to open config file: %s", configFile)
+		return nil, fmt.Errorf("Unable to open config file: %s, %w", configFile, err)
 	}
 	defer file.Close()
 
