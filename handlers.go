@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
 type searchResult struct {
@@ -85,7 +83,8 @@ func queryHistory(db *sql.DB, replaceHTTPWithHTTPS bool, searchTerm string) ([]s
 
 	rows, err := db.Query(query, queryParameters...)
 	if err != nil {
-		return nil, errors.Wrap(err, "Unable to create query")
+		return nil, fmt.Errorf("Unable to create query: %w", err)
+
 	}
 	defer rows.Close()
 
@@ -93,7 +92,7 @@ func queryHistory(db *sql.DB, replaceHTTPWithHTTPS bool, searchTerm string) ([]s
 	for rows.Next() {
 		var result searchResult
 		if err := rows.Scan(&result.Title, &result.URL, &result.LastVisitTime, &result.VisitCount); err != nil {
-			return nil, errors.Wrap(err, "Unable to scan row")
+			return nil, fmt.Errorf("Unable to scan row: %w", err)
 		}
 		searchResults = append(searchResults, result)
 	}
